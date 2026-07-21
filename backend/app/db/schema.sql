@@ -32,3 +32,28 @@ create table if not exists job_analyses (
     cover_letter text,
     created_at timestamptz not null default now()
 );
+
+-- Run this too (RPC used by vector_store.search_similar_chunks):
+create or replace function match_chunks(
+    query_embedding vector(768),
+    match_count int default 10
+)
+returns table (
+    id bigint,
+    document_id bigint,
+    content text,
+    chunk_index int,
+    similarity float
+)
+language sql stable
+as $$
+    select
+        chunks.id,
+        chunks.document_id,
+        chunks.content,
+        chunks.chunk_index,
+        1 - (chunks.embedding <=> query_embedding) as similarity
+    from chunks
+    order by chunks.embedding <=> query_embedding
+    limit match_count;
+$$;

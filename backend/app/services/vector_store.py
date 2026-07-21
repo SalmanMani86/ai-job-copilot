@@ -37,3 +37,24 @@ def save_chunks(document_id: int, chunks: list[dict], embeddings: list[list[floa
         for chunk, embedding in zip(chunks, embeddings)
     ]
     supabase.table("chunks").insert(rows).execute()
+
+
+def search_similar_chunks(query_embedding: list[float], match_count: int = 10) -> list[dict]:
+    supabase = get_supabase()
+    result = supabase.rpc(
+        "match_chunks",
+        {"query_embedding": query_embedding, "match_count": match_count},
+    ).execute()
+    return result.data
+
+
+def save_job_analysis(job_description: str, match_score: int, matched_skills: list[str], gaps: list[str]) -> None:
+    supabase = get_supabase()
+    supabase.table("job_analyses").insert(
+        {
+            "job_description": job_description,
+            "match_score": match_score,
+            "matched_skills": matched_skills,
+            "gaps": gaps,
+        }
+    ).execute()
