@@ -4,9 +4,10 @@ import { triggerIngest } from "@/lib/api";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { Button, Card } from "@/components/ui";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingStatus } from "@/components/LoadingStatus";
 
 export default function IngestPage() {
-  const { data: result, error, isLoading, run } = useAsyncAction(triggerIngest);
+  const { data: result, error, isLoading, elapsedSeconds, run } = useAsyncAction(triggerIngest);
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-16">
@@ -18,6 +19,8 @@ export default function IngestPage() {
       <Button onClick={() => run()} disabled={isLoading} className="mt-6">
         {isLoading ? "Ingesting…" : "Run ingestion"}
       </Button>
+
+      {isLoading && <LoadingStatus elapsedSeconds={elapsedSeconds} baseLabel="Starting ingestion…" />}
 
       {error && (
         <p role="alert" className="mt-6 text-sm text-red-400">

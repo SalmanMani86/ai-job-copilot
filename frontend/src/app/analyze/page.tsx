@@ -5,6 +5,7 @@ import { analyzeJob } from "@/lib/api";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { Button, Card, Chip } from "@/components/ui";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingStatus } from "@/components/LoadingStatus";
 
 function scoreTone(score: number): "success" | "warning" {
   return score >= 70 ? "success" : "warning";
@@ -12,7 +13,7 @@ function scoreTone(score: number): "success" | "warning" {
 
 export default function AnalyzePage() {
   const [jobDescription, setJobDescription] = useState("");
-  const { data: result, error, isLoading, run } = useAsyncAction(analyzeJob);
+  const { data: result, error, isLoading, elapsedSeconds, run } = useAsyncAction(analyzeJob);
   const textareaId = useId();
 
   return (
@@ -41,6 +42,8 @@ export default function AnalyzePage() {
       >
         {isLoading ? "Analyzing…" : "Analyze match"}
       </Button>
+
+      {isLoading && <LoadingStatus elapsedSeconds={elapsedSeconds} baseLabel="Searching your experience…" />}
 
       {error && (
         <p role="alert" className="mt-6 text-sm text-red-400">
